@@ -433,28 +433,81 @@
       animation: ambFloat 12s ease-in-out infinite reverse;
     }
 
-    /* ── HEADER ── */
+    /* ── HEADER (CLEAN & OVERFLOW-PROOF) ── */
     .chat-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: max(10px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 10px max(14px, env(safe-area-inset-left));
-      background: rgba(8, 8, 16, 0.88);
+      padding: max(8px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left));
+      background: rgba(8, 8, 16, 0.9);
       border-bottom: 1px solid var(--border);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      z-index: 30;
+      z-index: 40;
       flex-shrink: 0;
       position: relative;
-      min-height: 54px;
+      min-height: 52px;
+      gap: 8px;
     }
 
     .header-left {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       min-width: 0;
       flex: 1;
+    }
+
+    .header-chat-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      gap: 2px;
+      cursor: pointer;
+    }
+
+    .header-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 220px;
+      letter-spacing: -0.2px;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--success);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--success);
+      display: inline-block;
+      animation: pulse 2s infinite;
+      flex-shrink: 0;
+    }
+
+    .header-model-badge {
+      font-size: 0.68rem;
+      color: #c4b5fd;
+      font-family: var(--mono);
+      background: rgba(124, 58, 237, 0.14);
+      border: 1px solid rgba(124, 58, 237, 0.25);
+      padding: 1px 7px;
+      border-radius: 12px;
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 500;
     }
 
     .header-right {
@@ -464,12 +517,18 @@
       flex-shrink: 0;
     }
 
+    .desktop-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     .icon-btn {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
       color: var(--muted2);
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       border-radius: var(--r-sm);
       display: flex;
       align-items: center;
@@ -501,7 +560,7 @@
       gap: 6px;
       background: rgba(16, 185, 129, 0.08);
       border: 1px solid rgba(16, 185, 129, 0.2);
-      padding: 5px 9px;
+      padding: 4px 8px;
       border-radius: 20px;
       flex-shrink: 0;
     }
@@ -521,26 +580,10 @@
     }
 
     .status-text {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       color: var(--success);
       font-weight: 700;
       letter-spacing: .3px;
-    }
-
-    .model-badge {
-      background: rgba(124, 58, 237, 0.12);
-      border: 1px solid rgba(124, 58, 237, 0.25);
-      color: #c4b5fd;
-      padding: 4px 10px;
-      border-radius: 16px;
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: .2px;
-      max-width: 140px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      flex-shrink: 1;
     }
 
     .token-counter {
@@ -552,6 +595,133 @@
       border-radius: 6px;
       font-family: var(--mono);
       white-space: nowrap;
+    }
+
+    /* ── HEADER DROPDOWN POPOVER MENU ── */
+    .header-menu-popover {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 12px;
+      z-index: 120;
+      width: 270px;
+      background: rgba(14, 14, 26, 0.95);
+      border: 1px solid var(--border2);
+      border-radius: var(--r-md);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      padding: 8px;
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      transform-origin: top right;
+      animation: menuIn .22s var(--ease-spring) both;
+    }
+
+    @keyframes menuIn {
+      from {
+        opacity: 0;
+        transform: scale(0.92) translateY(-6px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .header-menu-popover.open {
+      display: flex;
+    }
+
+    #headerMenuBackdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 110;
+      display: none;
+    }
+
+    #headerMenuBackdrop.visible {
+      display: block;
+    }
+
+    .menu-status-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .menu-status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .menu-model-name {
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: #c4b5fd;
+      font-family: var(--mono);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .menu-token-stats {
+      font-size: 0.7rem;
+      color: var(--muted2);
+      font-family: var(--mono);
+    }
+
+    .menu-actions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: var(--r-sm);
+      background: transparent;
+      border: none;
+      color: var(--muted2);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: all .15s;
+      width: 100%;
+      min-height: 38px;
+    }
+
+    .menu-item:hover,
+    .menu-item:active {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+
+    .menu-item.text-danger {
+      color: #f87171;
+    }
+
+    .menu-item.text-danger:hover,
+    .menu-item.text-danger:active {
+      background: rgba(239, 68, 68, 0.12);
+      color: var(--danger);
+    }
+
+    .menu-item svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      flex-shrink: 0;
     }
 
     /* ── SYSTEM PROMPT PANEL ── */
@@ -1513,7 +1683,7 @@
       color: var(--text);
       padding: 12px 14px;
       border-radius: var(--r-md);
-      font-size: 16px; /* Avoid iOS auto-zoom */
+      font-size: 16px;
       outline: none;
       transition: all .25s var(--ease);
       appearance: none;
@@ -1944,6 +2114,19 @@
        MOBILE & TABLET RESPONSIVE OVERRIDES
     ══════════════════════════════════════════ */
     @media (max-width: 768px) {
+      .desktop-header-actions {
+        display: none !important;
+      }
+
+      .header-title {
+        max-width: 140px;
+        font-size: 0.82rem;
+      }
+
+      .header-model-badge {
+        max-width: 100px;
+      }
+
       #sidebar {
         position: fixed;
         top: 0;
@@ -2001,11 +2184,7 @@
       }
 
       .input-footer span:last-child {
-        display: none; /* Hide keyboard shortcut text on mobile */
-      }
-
-      .model-badge {
-        max-width: 100px;
+        display: none;
       }
 
       .conv-delete {
@@ -2100,7 +2279,7 @@
     <div class="ambient"></div>
     <div class="ambient2"></div>
 
-    <!-- HEADER -->
+    <!-- HEADER (CLEAN, SLICK & NON-OVERLAPPING) -->
     <header class="chat-header">
       <div class="header-left">
         <button class="icon-btn" onclick="toggleSidebar()" title="Toggle sidebar" aria-label="Toggle menu">
@@ -2108,32 +2287,97 @@
             <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
           </svg>
         </button>
-        <div class="status-pill" id="statusPill" style="display:none">
-          <div class="status-dot"></div>
-          <span class="status-text">LIVE</span>
+        <div class="header-chat-info" onclick="toggleHeaderMenu()">
+          <span class="header-title" id="headerTitle">AI Terminal Pro</span>
+          <div class="header-meta">
+            <span class="live-dot" id="headerLiveDot" style="display:none;"></span>
+            <span class="header-model-badge" id="modelBadge" style="display:none;"></span>
+          </div>
         </div>
-        <div class="model-badge" id="modelBadge" style="display:none"></div>
       </div>
+
       <div class="header-right">
-        <div class="token-counter" id="tokenCounter" style="display:none">~<span id="tokenCount">0</span> tokens</div>
-        <button class="icon-btn" onclick="exportChat()" title="Export Markdown" id="exportBtn" style="display:none">
-          <svg viewBox="0 0 24 24">
-            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-          </svg>
-        </button>
-        <button class="icon-btn" onclick="clearChat()" title="Clear messages" id="clearBtn" style="display:none">
-          <svg viewBox="0 0 24 24">
-            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
-          </svg>
-        </button>
-        <button class="icon-btn" onclick="openSetup()" title="Settings">
+        <!-- Desktop-only direct inline action icons -->
+        <div class="desktop-header-actions">
+          <div class="token-counter" id="tokenCounter" style="display:none">~<span id="tokenCount">0</span> tokens</div>
+          <button class="icon-btn" onclick="exportChat()" title="Export Markdown" id="exportBtn" style="display:none">
+            <svg viewBox="0 0 24 24">
+              <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+            </svg>
+          </button>
+          <button class="icon-btn" onclick="clearChat()" title="Clear messages" id="clearBtn" style="display:none">
+            <svg viewBox="0 0 24 24">
+              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+            </svg>
+          </button>
+        </div>
+
+        <button class="icon-btn" onclick="openSetup()" title="Settings" aria-label="Settings">
           <svg viewBox="0 0 24 24">
             <path
               d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.73 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.3-.06.63-.06.94s.02.64.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
           </svg>
         </button>
+
+        <!-- 3-Dots / Options Menu Trigger Button -->
+        <button class="icon-btn" id="headerMenuBtn" onclick="toggleHeaderMenu()" title="More Options" aria-label="More options">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- DROPDOWN / ACTION MENU -->
+      <div class="header-menu-popover" id="headerMenuPopover">
+        <div class="menu-status-card">
+          <div class="menu-status-row">
+            <div class="status-pill" id="menuStatusPill" style="display:flex;">
+              <div class="status-dot"></div>
+              <span class="status-text">LIVE</span>
+            </div>
+            <span class="menu-model-name" id="menuModelName">deepseek-v4-flash</span>
+          </div>
+          <div class="menu-token-stats" id="menuTokenStats">~0 tokens · $0.0000</div>
+        </div>
+
+        <div class="menu-actions-list">
+          <button class="menu-item" onclick="openSetup(); closeHeaderMenu();">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.73 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.3-.06.63-.06.94s.02.64.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+            </svg>
+            <span>Connection & API Key</span>
+          </button>
+          <button class="menu-item" onclick="toggleSysPanel(); closeHeaderMenu();">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+            </svg>
+            <span>System Prompt</span>
+          </button>
+          <button class="menu-item" onclick="exportChat(); closeHeaderMenu();">
+            <svg viewBox="0 0 24 24">
+              <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+            </svg>
+            <span>Export as Markdown</span>
+          </button>
+          <button class="menu-item" onclick="newConversation(); closeHeaderMenu();">
+            <svg viewBox="0 0 24 24">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+            </svg>
+            <span>New Conversation</span>
+          </button>
+          <button class="menu-item text-danger" onclick="clearChat(); closeHeaderMenu();">
+            <svg viewBox="0 0 24 24">
+              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+            </svg>
+            <span>Clear Messages</span>
+          </button>
+        </div>
       </div>
     </header>
+    <div id="headerMenuBackdrop" onclick="closeHeaderMenu()"></div>
 
     <!-- SYSTEM PROMPT PANEL -->
     <div id="sys-panel">
@@ -2345,6 +2589,26 @@
       window.visualViewport.addEventListener('scroll', updateAppHeight);
     }
 
+    // ── HEADER POPUP MENU ──
+    function toggleHeaderMenu() {
+      const pop = document.getElementById('headerMenuPopover');
+      const backdrop = document.getElementById('headerMenuBackdrop');
+      const isOpen = pop.classList.contains('open');
+      if (isOpen) {
+        closeHeaderMenu();
+      } else {
+        pop.classList.add('open');
+        backdrop.classList.add('visible');
+      }
+    }
+
+    function closeHeaderMenu() {
+      const pop = document.getElementById('headerMenuPopover');
+      const backdrop = document.getElementById('headerMenuBackdrop');
+      if (pop) pop.classList.remove('open');
+      if (backdrop) backdrop.classList.remove('visible');
+    }
+
     // ── INIT ──
     (function boot() {
       updateAppHeight();
@@ -2401,6 +2665,7 @@
       } else {
         sb.classList.toggle('collapsed');
       }
+      closeHeaderMenu();
     }
 
     function closeMobileSidebar() {
@@ -2440,6 +2705,7 @@
     function openSetup() {
       document.getElementById('setup').classList.remove('hidden');
       if (typeof startAntigravity === 'function') startAntigravity();
+      closeHeaderMenu();
     }
 
     function closeSetup() {
@@ -2448,12 +2714,22 @@
     }
 
     function activateChat() {
-      document.getElementById('statusPill').style.display = 'flex';
-      document.getElementById('modelBadge').style.display = 'block';
-      document.getElementById('modelBadge').textContent = model;
-      document.getElementById('tokenCounter').style.display = 'block';
-      document.getElementById('exportBtn').style.display = 'flex';
-      document.getElementById('clearBtn').style.display = 'flex';
+      const dot = document.getElementById('headerLiveDot');
+      if (dot) dot.style.display = 'inline-block';
+      const badge = document.getElementById('modelBadge');
+      if (badge) {
+        badge.style.display = 'inline-block';
+        badge.textContent = model;
+      }
+      const menuMod = document.getElementById('menuModelName');
+      if (menuMod) menuMod.textContent = model;
+      
+      const tc = document.getElementById('tokenCounter');
+      if (tc) tc.style.display = 'block';
+      const eb = document.getElementById('exportBtn');
+      if (eb) eb.style.display = 'flex';
+      const cb = document.getElementById('clearBtn');
+      if (cb) cb.style.display = 'flex';
     }
 
     // ── TEXTAREA AUTO-RESIZE & KEY EVENTS ──
@@ -2468,6 +2744,7 @@
 
     ta.addEventListener('focus', () => {
       setTimeout(scrollBottom, 250);
+      closeHeaderMenu();
     });
 
     ta.addEventListener('keydown', e => {
@@ -2731,7 +3008,6 @@
 
     function renderMarkdown(text) {
       if (!text) return '';
-      // Process code blocks with syntax highlighting & render button
       const processed = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
         const id = 'cb' + Math.random().toString(36).slice(2, 8);
         const raw = code.trim();
@@ -2764,7 +3040,6 @@
         }
       });
 
-      // Clean up marked p wrappers around code blocks
       div.querySelectorAll('p').forEach(p => {
         if (p.innerHTML.includes('code-block-wrap')) {
           p.outerHTML = p.innerHTML;
@@ -2804,6 +3079,9 @@
       renderConvList();
       clearMessages();
       closeMobileSidebar();
+      closeHeaderMenu();
+      const ht = document.getElementById('headerTitle');
+      if (ht) ht.textContent = 'New conversation';
     }
 
     function loadConversation(id) {
@@ -2811,7 +3089,11 @@
       renderConvList();
       clearMessages();
       const conv = getActiveConv();
-      if (!conv || conv.messages.length === 0) return;
+      if (!conv) return;
+      const ht = document.getElementById('headerTitle');
+      if (ht) ht.textContent = conv.title || 'AI Terminal Pro';
+
+      if (conv.messages.length === 0) return;
       removeEmpty();
       conv.messages.forEach(m => {
         if (m.role === 'system') return;
@@ -2819,6 +3101,7 @@
       });
       updateTokenCount();
       closeMobileSidebar();
+      closeHeaderMenu();
     }
 
     function deleteConversation(id, e) {
@@ -2829,6 +3112,8 @@
         activeConvId = null;
         clearMessages();
         renderConvList();
+        const ht = document.getElementById('headerTitle');
+        if (ht) ht.textContent = 'AI Terminal Pro';
       } else {
         renderConvList();
       }
@@ -2878,7 +3163,7 @@
     }
 
     function titleFromText(text) {
-      return text.slice(0, 36).replace(/\n/g, ' ') + (text.length > 36 ? '…' : '');
+      return text.slice(0, 32).replace(/\n/g, ' ') + (text.length > 32 ? '…' : '');
     }
 
     // ── MESSAGES DOM ──
@@ -3107,6 +3392,8 @@
       }
       const el = document.getElementById('tokenCount');
       if (el) el.textContent = t.toLocaleString() + costStr;
+      const menuTokens = document.getElementById('menuTokenStats');
+      if (menuTokens) menuTokens.textContent = `~${t.toLocaleString()} tokens${costStr}`;
     }
 
     // ── SETUP ──
@@ -3221,6 +3508,8 @@
         if (conv.messages.filter(m => m.role === 'user').length === 1) {
           conv.title = titleFromText(text || attachments[0]?.name || 'New conversation');
           renderConvList();
+          const ht = document.getElementById('headerTitle');
+          if (ht) ht.textContent = conv.title;
         }
         appendMessage('user', text, true, '', attachments);
       }
@@ -3504,6 +3793,7 @@
         newConversation();
       }
       if (e.key === 'Escape') {
+        closeHeaderMenu();
         if (!document.getElementById('setup').classList.contains('hidden')) closeSetup();
         else if (document.getElementById('canvas-panel').classList.contains('open')) closeCanvas();
         else closeMobileSidebar();
