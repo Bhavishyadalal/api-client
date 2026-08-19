@@ -31,17 +31,17 @@ export default async function handler(request) {
     return new Response(null, { headers: corsHeaders() });
   }
 
-  const url = new URL(request.url);
-  // Strip the "/api/proxy" prefix, forward whatever path/query comes after it
-  // e.g. /api/proxy/v1/chat/completions -> https://gorouter.app/v1/chat/completions
-  const forwardPath = url.pathname.replace(/^\/api\/proxy/, '') || '/v1/chat/completions';
-  const upstreamUrl = UPSTREAM + forwardPath + url.search;
+  // The website sends the REAL target URL (e.g. https://gorouter.app/v1/chat/completions)
+  // in this custom header, so we don't have to rely on Vercel forwarding sub-paths.
+  const targetHeader = request.headers.get('x-proxy-target');
+  const upstreamUrl = targetHeader || (UPSTREAM + '/v1/chat/completions');
 
   const headers = new Headers(request.headers);
   headers.delete('host');
   headers.delete('origin');
   headers.delete('referer');
   headers.delete('connection');
+  headers.delete('x-proxy-target');
 
   try {
     const upstreamRes = await fetch(upstreamUrl, {
@@ -74,4 +74,4 @@ function corsHeaders() {
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Max-Age': '86400',
   };
-    }
+}
