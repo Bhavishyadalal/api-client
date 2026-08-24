@@ -1767,6 +1767,23 @@
       font-family: var(--sans);
     }
 
+    /* Space for the absolute Fetch button so text never sits under it */
+    #modelinput {
+      padding-right: 78px;
+      cursor: pointer;
+      caret-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    #modelinput::selection {
+      background: transparent;
+    }
+
+    .model-picker-wrap {
+      cursor: pointer;
+    }
+
     input[type=password]:focus,
     input[type=text]:focus,
     select:focus {
@@ -1783,22 +1800,35 @@
     .fetch-btn {
       position: absolute;
       right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid var(--border);
       color: var(--muted2);
-      padding: 8px 12px;
+      padding: 7px 12px;
       border-radius: 8px;
       cursor: pointer;
       font-size: 0.76rem;
       font-weight: 700;
       font-family: var(--sans);
       transition: all .2s;
+      min-height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
     }
 
     .fetch-btn:hover,
     .fetch-btn:active {
       background: var(--primary);
       color: white;
+      border-color: var(--primary);
+    }
+
+    .fetch-btn:disabled {
+      opacity: 0.55;
+      cursor: wait;
     }
 
     /* Model picker: typeable input + tappable results panel.
@@ -1807,28 +1837,94 @@
     .model-dropdown {
       display: none;
       position: relative;
-      margin-top: 6px;
-      max-height: 220px;
+      margin-top: 8px;
+      max-height: min(280px, 42vh);
       overflow-y: auto;
-      background: var(--surface);
+      overflow-x: hidden;
+      background: var(--surface2);
       border: 1px solid var(--border2);
       border-radius: var(--r-md);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
-      z-index: 40;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      z-index: 50;
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+    }
+
+    .model-dropdown::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .model-dropdown::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .model-dropdown::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 5px;
     }
 
     .model-dropdown.open {
       display: block;
+      animation: modelDropIn .2s var(--ease) both;
+    }
+
+    @keyframes modelDropIn {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .model-dropdown-header {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(14, 14, 26, 0.96);
+      border-bottom: 1px solid var(--border);
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .model-dropdown-count {
+      font-family: var(--mono);
+      font-weight: 500;
+      color: var(--muted2);
+      text-transform: none;
+      letter-spacing: 0;
     }
 
     .model-dropdown-item {
-      padding: 12px 14px;
-      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      min-height: 44px;
+      font-size: 0.84rem;
+      font-family: var(--mono);
       color: var(--text);
       cursor: pointer;
-      border-bottom: 1px solid var(--border);
-      word-break: break-all;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      line-height: 1.35;
+      transition: background .12s ease, color .12s ease;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .model-dropdown-item:last-child {
@@ -1838,13 +1934,59 @@
     .model-dropdown-item:hover,
     .model-dropdown-item:active,
     .model-dropdown-item.active {
-      background: var(--primary-soft, rgba(124, 58, 237, 0.14));
+      background: var(--primary-soft, rgba(124, 58, 237, 0.16));
+      color: #fff;
+    }
+
+    .model-dropdown-item .model-id {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .model-dropdown-item .model-check {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      opacity: 0;
+      color: var(--primary2);
+      transition: opacity .12s;
+    }
+
+    .model-dropdown-item.active .model-check,
+    .model-dropdown-item:hover .model-check {
+      opacity: 1;
     }
 
     .model-dropdown-empty {
-      padding: 12px 14px;
-      font-size: 0.82rem;
+      padding: 16px 14px;
+      font-size: 0.8rem;
       color: var(--muted);
+      text-align: center;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 480px) {
+      .model-dropdown {
+        max-height: min(240px, 38vh);
+      }
+
+      .model-dropdown-item {
+        padding: 12px 12px;
+        font-size: 0.8rem;
+        min-height: 46px;
+      }
+
+      #modelinput {
+        padding-right: 72px;
+      }
+
+      .fetch-btn {
+        padding: 6px 10px;
+        font-size: 0.72rem;
+      }
     }
 
     .connect-btn {
@@ -2654,9 +2796,9 @@
 
       <div class="form-group">
         <label class="form-label" for="modelinput">Model</label>
-        <div class="input-rel">
-          <input type="text" id="modelinput" value="deepseek-v4-flash" placeholder="model name" spellcheck="false" autocomplete="off">
-          <button class="fetch-btn" id="loadModelsBtn" onclick="fetchModels()">Fetch</button>
+        <div class="input-rel model-picker-wrap">
+          <input type="text" id="modelinput" value="deepseek-v4-flash" placeholder="Select a model" spellcheck="false" autocomplete="off" readonly>
+          <button class="fetch-btn" id="loadModelsBtn" onclick="fetchModels()" type="button">Fetch</button>
         </div>
         <div id="modelinput-list" class="model-dropdown"></div>
       </div>
@@ -3013,18 +3155,45 @@
       const dd = document.getElementById('modelinput-list');
       if (!modelEl || !dd) return;
 
-      modelEl.addEventListener('focus', openModelDropdown);
-      modelEl.addEventListener('click', openModelDropdown);
-      modelEl.addEventListener('input', () => {
-        renderModelDropdown(modelEl.value);
-        document.getElementById('modelinput-list')?.classList.add('open');
+      // Pure click-to-open list — no typing / filtering
+      const toggleList = (e) => {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        if (dd.classList.contains('open')) {
+          closeModelDropdown();
+        } else {
+          openModelDropdown();
+        }
+      };
+
+      modelEl.addEventListener('click', toggleList);
+      // Prevent keyboard from focusing / typing
+      modelEl.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+          closeModelDropdown();
+          modelEl.blur();
+        } else if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          openModelDropdown();
+        } else {
+          // Block any character input
+          e.preventDefault();
+        }
       });
-      modelEl.addEventListener('blur', () => {
-        // slight delay so a tap on a dropdown item registers first
-        setTimeout(closeModelDropdown, 150);
+      modelEl.addEventListener('focus', () => {
+        // Don't auto-open on focus alone (mobile keyboard edge cases) — only on explicit click
       });
+
+      // Keep dropdown interactive on touch without immediately closing
+      dd.addEventListener('mousedown', e => e.preventDefault());
+      dd.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
+
       document.addEventListener('click', e => {
-        if (e.target !== modelEl && !dd.contains(e.target)) closeModelDropdown();
+        const fetchBtn = document.getElementById('loadModelsBtn');
+        if (e.target === modelEl || dd.contains(e.target) || e.target === fetchBtn || fetchBtn?.contains(e.target)) return;
+        closeModelDropdown();
       });
     })();
 
@@ -3791,30 +3960,44 @@
     }
 
     // ── MODEL PICKER (custom dropdown; native <datalist> is unreliable on mobile) ──
-    let availableModels = ['deepseek-v4-flash', 'deepseek-v4-pro', 'gpt-5.2', 'claude-sonnet-4.6'];
+    let availableModels = ['claude-sonnet-4.6', 'deepseek-v4-flash', 'deepseek-v4-pro', 'gpt-5.2'];
 
-    function renderModelDropdown(filterText) {
+    function renderModelDropdown() {
       const dd = document.getElementById('modelinput-list');
       if (!dd) return;
-      const f = (filterText || '').trim().toLowerCase();
-      const items = f ? availableModels.filter(m => m.toLowerCase().includes(f)) : availableModels;
+      // Always show the full list — no typing / search filter
+      const items = availableModels.slice();
+      const currentVal = (document.getElementById('modelinput')?.value || '').trim();
       dd.innerHTML = '';
+
       if (items.length === 0) {
         const empty = document.createElement('div');
         empty.className = 'model-dropdown-empty';
-        empty.textContent = f ? 'No matches — press Fetch or keep typing your own model name' : 'No models yet — tap Fetch';
+        empty.textContent = 'No models yet — tap Fetch to load them';
         dd.appendChild(empty);
         return;
       }
+
+      // Sticky header with count
+      const header = document.createElement('div');
+      header.className = 'model-dropdown-header';
+      header.innerHTML = `<span>Models</span><span class="model-dropdown-count">${items.length}</span>`;
+      dd.appendChild(header);
+
+      const checkSvg = '<svg class="model-check" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+
       items.forEach(id => {
         const item = document.createElement('div');
-        item.className = 'model-dropdown-item';
-        item.textContent = id;
+        item.className = 'model-dropdown-item' + (id === currentVal ? ' active' : '');
+        item.setAttribute('title', id);
+        item.innerHTML = `<span class="model-id">${escHtml(id)}</span>${checkSvg}`;
         item.addEventListener('mousedown', ev => {
-          // mousedown (not click) so this fires before the input's blur closes the dropdown
+          // mousedown so selection works before any blur/close
           ev.preventDefault();
           const inp = document.getElementById('modelinput');
-          inp.value = id;
+          if (inp) {
+            inp.value = id;
+          }
           closeModelDropdown();
         });
         dd.appendChild(item);
@@ -3824,8 +4007,13 @@
     function openModelDropdown() {
       const dd = document.getElementById('modelinput-list');
       if (!dd) return;
-      renderModelDropdown(document.getElementById('modelinput')?.value);
+      renderModelDropdown(); // always full list
       dd.classList.add('open');
+      // Scroll the currently selected model into view
+      requestAnimationFrame(() => {
+        const active = dd.querySelector('.model-dropdown-item.active');
+        if (active) active.scrollIntoView({ block: 'nearest' });
+      });
     }
 
     function closeModelDropdown() {
@@ -3861,14 +4049,15 @@
         const data = await res.json();
         const list = data.data || data.models || (Array.isArray(data) ? data : null);
         if (list && list.length > 0) {
-          const ids = list.map(m => (typeof m === 'string' ? m : (m.id || m.name))).filter(Boolean);
+          const ids = [...new Set(list.map(m => (typeof m === 'string' ? m : (m.id || m.name))).filter(Boolean))]
+            .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
           availableModels = ids;
           // Keep whatever the user had typed unless the field was empty
           if (!current && ids.length > 0) {
             sel.value = ids[0];
           }
           openModelDropdown();
-          toast('Models loaded ✓ — tap one to select');
+          toast(`Loaded ${ids.length} model${ids.length === 1 ? '' : 's'} ✓`);
         } else {
           throw new Error('empty');
         }
@@ -3935,11 +4124,11 @@
 
       const cfg = providers[p] || providers.custom;
       ep.value = cfg.endpoint;
-      availableModels = cfg.models.slice();
+      availableModels = cfg.models.slice().sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
       // Keep whatever the user already typed; otherwise default to this
       // provider's first suggested model.
-      if (!currentModel && cfg.models.length > 0) {
-        sel.value = cfg.models[0];
+      if (!currentModel && availableModels.length > 0) {
+        sel.value = availableModels[0];
       } else if (currentModel) {
         sel.value = currentModel;
       }
